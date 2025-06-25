@@ -137,7 +137,7 @@ export default function ExpenseList({ expenses, onGenerateReceipt }: ExpenseList
                 {filteredExpenses.map((expense) => (
                   <TableRow key={expense.id}>
                     <TableCell>
-                      {format(new Date(expense.date), 'MMM dd, yyyy')}
+                      {format(new Date(expense.date), 'dd/MM/yy')}
                     </TableCell>
                     <TableCell>{expense.description}</TableCell>
                     <TableCell>
@@ -149,7 +149,7 @@ export default function ExpenseList({ expenses, onGenerateReceipt }: ExpenseList
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right font-medium expense-amount">
-                      ${parseFloat(expense.amount).toFixed(2)}
+                      ₹{parseFloat(expense.amount).toFixed(2)}
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center space-x-2">
@@ -180,7 +180,7 @@ export default function ExpenseList({ expenses, onGenerateReceipt }: ExpenseList
                     Monthly Total:
                   </TableCell>
                   <TableCell className="text-right font-bold text-primary">
-                    ${monthlyTotal.toFixed(2)}
+                    ₹{monthlyTotal.toFixed(2)}
                   </TableCell>
                   <TableCell />
                 </TableRow>

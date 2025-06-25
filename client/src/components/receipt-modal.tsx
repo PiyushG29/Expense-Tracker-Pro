@@ -50,7 +50,7 @@ export default function ReceiptModal({ isOpen, onClose, expenses, month, user }:
                 Period: <span className="text-foreground">{month}</span>
               </p>
               <p className="text-sm text-muted-foreground">
-                Generated: <span className="text-foreground">{format(new Date(), 'MMMM dd, yyyy')}</span>
+                Generated: <span className="text-foreground">{format(new Date(), 'dd/MM/yy')}</span>
               </p>
             </div>
             
@@ -78,12 +78,12 @@ export default function ReceiptModal({ isOpen, onClose, expenses, month, user }:
               {expenses.map((expense) => (
                 <tr key={expense.id} className="border-b">
                   <td className="py-2 text-sm">
-                    {format(new Date(expense.date), 'MM/dd/yyyy')}
+                    {format(new Date(expense.date), 'dd/MM/yy')}
                   </td>
                   <td className="py-2 text-sm">{expense.description}</td>
                   <td className="py-2 text-sm">{expense.category}</td>
                   <td className="py-2 text-sm text-right">
-                    ${parseFloat(expense.amount).toFixed(2)}
+                    ₹{parseFloat(expense.amount).toFixed(2)}
                   </td>
                 </tr>
               ))}
@@ -94,7 +94,7 @@ export default function ReceiptModal({ isOpen, onClose, expenses, month, user }:
                   Total Amount:
                 </td>
                 <td className="py-3 text-sm text-right font-bold text-primary">
-                  ${total.toFixed(2)}
+                  ₹{total.toFixed(2)}
                 </td>
               </tr>
             </tfoot>

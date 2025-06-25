@@ -114,7 +114,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                     }`}>
                       {monthName}
                     </h3>
-                    <p className="text-2xl font-bold">${stat.total.toFixed(2)}</p>
+                    <p className="text-2xl font-bold">₹{stat.total.toFixed(2)}</p>
                     <p className="text-sm text-muted-foreground">{stat.count} expenses</p>
                   </div>
                 );

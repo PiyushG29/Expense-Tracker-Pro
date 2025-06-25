@@ -32,7 +32,7 @@ export default function StatsCards({ expenses, monthlyStats }: StatsCardsProps) 
           </div>
           <div className="ml-4">
             <p className="text-sm font-medium text-muted-foreground">This Month</p>
-            <p className="text-2xl font-semibold">${currentMonthStats.total.toFixed(2)}</p>
+            <p className="text-2xl font-semibold">₹{currentMonthStats.total.toFixed(2)}</p>
           </div>
         </CardContent>
       </Card>
@@ -44,7 +44,7 @@ export default function StatsCards({ expenses, monthlyStats }: StatsCardsProps) 
           </div>
           <div className="ml-4">
             <p className="text-sm font-medium text-muted-foreground">Last Month</p>
-            <p className="text-2xl font-semibold">${lastMonthStats.total.toFixed(2)}</p>
+            <p className="text-2xl font-semibold">₹{lastMonthStats.total.toFixed(2)}</p>
           </div>
         </CardContent>
       </Card>
@@ -68,7 +68,7 @@ export default function StatsCards({ expenses, monthlyStats }: StatsCardsProps) 
           </div>
           <div className="ml-4">
             <p className="text-sm font-medium text-muted-foreground">Avg Monthly</p>
-            <p className="text-2xl font-semibold">${avgMonthly.toFixed(2)}</p>
+            <p className="text-2xl font-semibold">₹{avgMonthly.toFixed(2)}</p>
           </div>
         </CardContent>
       </Card>
