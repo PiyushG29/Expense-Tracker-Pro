@@ -1,7 +1,7 @@
 import { users, expenses, type User, type InsertUser, type Expense, type InsertExpense } from "@shared/schema";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-serverless";
-import { neon } from "@neondatabase/serverless";
+import { neon, neonConfig } from "@neondatabase/serverless";
 
 export interface IStorage {
   // User operations
@@ -132,8 +132,15 @@ export class DatabaseStorage implements IStorage {
   private db;
 
   constructor() {
-    const sql_client = neon(process.env.DATABASE_URL!);
-    this.db = drizzle(sql_client);
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL environment variable is required");
+    }
+    
+    // Configure neon for serverless environment
+    neonConfig.fetchConnectionCache = true;
+    
+    const sql = neon(process.env.DATABASE_URL);
+    this.db = drizzle(sql);
   }
 
   async getUser(id: number): Promise<User | undefined> {
