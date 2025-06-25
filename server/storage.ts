@@ -136,9 +136,6 @@ export class DatabaseStorage implements IStorage {
       throw new Error("DATABASE_URL environment variable is required");
     }
     
-    // Configure neon for serverless environment
-    neonConfig.fetchConnectionCache = true;
-    
     const sql = neon(process.env.DATABASE_URL);
     this.db = drizzle(sql);
   }
