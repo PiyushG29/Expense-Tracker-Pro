@@ -8,6 +8,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // CORS middleware
 app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.path}`);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-user-id');

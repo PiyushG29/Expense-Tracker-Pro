@@ -28,6 +28,7 @@ class AuthService {
       localStorage.setItem('user', JSON.stringify(data.user));
       return data.user;
     } catch (error) {
+      console.error('Login error:', error);
       throw error;
     }
   }

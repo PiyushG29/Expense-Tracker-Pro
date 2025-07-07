@@ -36,6 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ user });
     } catch (error: any) {
+      console.error('Login error:', error);
       res.status(500).json({ message: error.message });
     }
   });
