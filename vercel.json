@@ -2,14 +2,24 @@
   "version": 2,
   "builds": [
     {
+      "src": "server/index.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["shared/**", "server/**"]
+      }
+    },
+    {
       "src": "package.json",
-      "use": "@vercel/node"
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/public"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server/index.js"
+      "dest": "/server/index.ts"
     },
     {
       "handle": "filesystem"

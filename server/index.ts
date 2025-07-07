@@ -6,6 +6,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// CORS middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-user-id');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -36,32 +49,48 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
-  const server = await registerRoutes(app);
+// Initialize the app
+let initialized = false;
+async function initializeApp() {
+  if (!initialized) {
+    const server = await registerRoutes(app);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
 
-    res.status(status).json({ message });
-    throw err;
-  });
+      res.status(status).json({ message });
+      console.error(err);
+    });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  const nodeEnv = process.env.NODE_ENV || "development";
-  if (nodeEnv === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    // In production, just serve static files
+    const nodeEnv = process.env.NODE_ENV || "development";
+    if (nodeEnv !== "production") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+
+    initialized = true;
   }
+  return app;
+}
 
-  // Use Vercel's dynamic port in production, fallback to 5000 for development
-  const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
-  const host = process.env.NODE_ENV === "production" ? undefined : "0.0.0.0";
-  
-  server.listen(port, host, () => {
-    log(`serving on port ${port}`);
-  });
-})();
+// For Vercel serverless functions
+export default async function handler(req: any, res: any) {
+  await initializeApp();
+  return app(req, res);
+}
+
+// For local development
+if (process.env.NODE_ENV !== "production") {
+  (async () => {
+    await initializeApp();
+    const port = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+    const host = "0.0.0.0";
+    
+    app.listen(port, host, () => {
+      log(`serving on port ${port}`);
+    });
+  })();
+}
