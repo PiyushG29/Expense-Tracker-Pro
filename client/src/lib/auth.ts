@@ -8,23 +8,28 @@ class AuthService {
   private user: AuthUser | null = null;
 
   async login(email: string, name: string): Promise<AuthUser> {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, name }),
-      credentials: 'include',
-    });
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, name }),
+        credentials: 'include',
+      });
 
-    if (!response.ok) {
-      throw new Error('Login failed');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Login failed: ${response.status} ${errorText}`);
+      }
+
+      const data = await response.json();
+      this.user = data.user;
+      localStorage.setItem('user', JSON.stringify(data.user));
+      return data.user;
+    } catch (error) {
+      throw error;
     }
-
-    const data = await response.json();
-    this.user = data.user;
-    localStorage.setItem('user', JSON.stringify(data.user));
-    return data.user;
   }
 
   async getCurrentUser(): Promise<AuthUser | null> {

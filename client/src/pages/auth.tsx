@@ -35,9 +35,10 @@ export default function Auth({ onLogin, isLoading }: AuthProps) {
         description: "Welcome to ExpenseTracker Pro!",
       });
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Login failed. Please try again.";
       toast({
         title: "Error",
-        description: "Login failed. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
