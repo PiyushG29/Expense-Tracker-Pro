@@ -77,10 +77,13 @@ async function initializeApp() {
 }
 
 // For Vercel serverless functions
-export default async function handler(req: any, res: any) {
+module.exports = async function handler(req: any, res: any) {
   await initializeApp();
   return app(req, res);
 }
+
+// Also export as default for ES module compatibility
+export default module.exports;
 
 // For local development
 if (process.env.NODE_ENV !== "production") {
