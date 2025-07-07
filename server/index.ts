@@ -8,7 +8,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // CORS middleware
 app.use((req, res, next) => {
-  console.log(`Incoming request: ${req.method} ${req.path}`);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-user-id');
@@ -52,35 +51,81 @@ app.use((req, res, next) => {
 
 // Initialize the app
 let initialized = false;
+let appInstance: any = null;
+
 async function initializeApp() {
   if (!initialized) {
-    const server = await registerRoutes(app);
+    try {
+      const server = await registerRoutes(app);
 
-    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
+      app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+        const status = err.status || err.statusCode || 500;
+        const message = err.message || "Internal Server Error";
 
-      res.status(status).json({ message });
-      console.error(err);
-    });
+        res.status(status).json({ message });
+        console.error(err);
+      });
 
-    // In production, just serve static files
-    const nodeEnv = process.env.NODE_ENV || "development";
-    if (nodeEnv !== "production") {
-      await setupVite(app, server);
-    } else {
-      serveStatic(app);
+      // Check if we're in Vercel environment
+      const isVercel = process.env.VERCEL || process.env.NODE_ENV === "production";
+      
+      if (!isVercel) {
+        // Local development with Vite
+        await setupVite(app, server);
+      } else {
+        // Production/Vercel - serve static files
+        serveStatic(app);
+      }
+
+      initialized = true;
+      appInstance = app;
+    } catch (error) {
+      console.error('App initialization error:', error);
+      throw error;
     }
-
-    initialized = true;
   }
-  return app;
+  return appInstance || app;
 }
 
 // For Vercel serverless functions
 module.exports = async function handler(req: any, res: any) {
-  await initializeApp();
-  return app(req, res);
+  try {
+    // Simple initialization for Vercel
+    if (process.env.VERCEL) {
+      // Just register routes without Vite for Vercel
+      const simpleApp = express();
+      simpleApp.use(express.json());
+      simpleApp.use(express.urlencoded({ extended: false }));
+      
+      // CORS
+      simpleApp.use((req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-user-id');
+        
+        if (req.method === 'OPTIONS') {
+          res.status(200).end();
+          return;
+        }
+        next();
+      });
+      
+      // Register API routes only
+      await registerRoutes(simpleApp);
+      
+      return simpleApp(req, res);
+    } else {
+      // Local development with full setup
+      const app = await initializeApp();
+      return app(req, res);
+    }
+  } catch (error) {
+    console.error('Vercel handler error:', error);
+    return res.status(500).json({ 
+      message: 'Internal server error',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
 }
 
 // Also export as default for ES module compatibility
