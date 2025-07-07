@@ -24,10 +24,11 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
 });
 
-export const insertExpenseSchema = createInsertSchema(expenses).omit({
-  id: true,
-  userId: true,
-  createdAt: true,
+export const insertExpenseSchema = z.object({
+  amount: z.string().min(1, "Amount is required"),
+  description: z.string().min(1, "Description is required"),
+  category: z.string().min(1, "Category is required"),
+  date: z.string().or(z.date()).transform((val) => new Date(val)),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

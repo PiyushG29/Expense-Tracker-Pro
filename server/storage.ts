@@ -216,4 +216,11 @@ export class DatabaseStorage implements IStorage {
 }
 
 // Use database storage in production, memory storage for development/testing
-export const storage = process.env.DATABASE_URL ? new DatabaseStorage() : new MemStorage();
+const isDatabaseAvailable = process.env.DATABASE_URL && process.env.DATABASE_URL.length > 0;
+export const storage = isDatabaseAvailable ? new DatabaseStorage() : new MemStorage();
+
+console.log(`Using storage type: ${isDatabaseAvailable ? 'DatabaseStorage' : 'MemStorage'}`);
+console.log(`DATABASE_URL is ${isDatabaseAvailable ? 'set' : 'not set'}`);
+if (isDatabaseAvailable) {
+  console.log(`Database URL: ${process.env.DATABASE_URL?.substring(0, 50)}...`);
+}

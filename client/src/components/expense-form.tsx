@@ -54,10 +54,19 @@ export default function ExpenseForm() {
         description: "Expense added successfully!",
       });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('Add expense error:', error);
+      const errorMessage = error?.message || "Failed to add expense. Please try again.";
+      const errors = error?.errors;
+      
+      if (errors && errors.length > 0) {
+        const errorDetails = errors.map((err: any) => `${err.path?.join('.')}: ${err.message}`).join(', ');
+        console.error('Validation errors:', errorDetails);
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to add expense. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -79,7 +88,7 @@ export default function ExpenseForm() {
       amount,
       description,
       category,
-      date: new Date(date),
+      date: new Date(date).toISOString(),
     };
 
     addExpenseMutation.mutate(expenseData);
